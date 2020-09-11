@@ -4,6 +4,7 @@
 #include "filesystem"
 #include "conio.h"
 #include "stdio.h"
+#include <chrono> 
 
 #include "windows.h"
 
@@ -80,8 +81,15 @@ void runJava(std::string fPath, const bool flag_outputToFile)
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::string cmd = "java \"" + fPath + "\"";
+
+		auto start = std::chrono::high_resolution_clock::now();
+
 		system(cmd.c_str());
+		
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << "Time Taken : " << duration.count() << "ms" << std::endl << std::endl;
 	}
 }
 
@@ -97,8 +105,15 @@ void runPy(std::string fPath, const bool flag_outputToFile)
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::string cmd = "python3 \"" + fPath + "\"";
+
+		auto start = std::chrono::high_resolution_clock::now();
+
 		system(cmd.c_str());
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << "Time Taken : " << duration.count() << "ms" << std::endl << std::endl;
 	}
 }
 
@@ -115,10 +130,18 @@ void runCpp(std::string fPath, const bool flag_outputToFile)
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		system(cmd.c_str());
+
+		auto start = std::chrono::high_resolution_clock::now();
+
 		system("cppprog.exe");
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << "Time Taken : " << duration.count() << "ms" << std::endl;
+
 		remove("cppprog.exe");
 		std::cout << std::endl;
-		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 	}
 }
 
@@ -127,7 +150,7 @@ void unknownFile(std::string fname)
 	SetConsoleColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 	std::cout << "Failed to Run " << fname << std::endl;
 	SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	std::cout << "Was Unable to identify the Programming language of the file"<<std::endl;
+	std::cout << "Was Unable to identify the Programming language of the file" << std::endl << std::endl;
 	SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 }
 
