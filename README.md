@@ -8,5 +8,9 @@ You Can download the executable and try it yourself. [Click Here To Download the
 Complirun is best suited for programs that takes no input and is being run just check the output<br>
 
 ## Syntax
+Type `complirun help` To get Help<br>
 Use `-p` flag to add path to the directory containing all the files to be test ran<br>
+Use `-f` flag to add path to the source code<br>
 Use of `-o` flag is under development. It will be used print the output to a file<br>
+<br>
+`Note` _You cannot use `-f` and `-p` at the Same Time_<br> 

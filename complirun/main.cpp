@@ -4,17 +4,48 @@
 #include "filesystem"
 #include "conio.h"
 #include "stdio.h"
-#include <chrono> 
+#include <chrono>
+#include "fstream"
+#include "sstream";
 
 #include "windows.h"
 
+#include <direct.h>
+#define GetCurrentDir _getcwd
+
 
 namespace fs = std::experimental::filesystem;
+
+std::vector<std::string> fileWriteBuffer;
+
+std::string exec(std::string cmd)
+{
+	std::string rt="";
+	std::string textFromFile;
+	cmd = cmd + " > this_is_an_outputfile.txt";
+	system(cmd.c_str());
+	std::ifstream file("this_is_an_outputfile.txt");
+	while (getline(file, textFromFile))
+	{
+		rt = rt + textFromFile;
+	}
+	file.close();
+	remove("this_is_an_outputfile.txt");
+	return rt;
+}
 
 void SetConsoleColor(WORD COLOR)
 {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(out, COLOR);
+}
+
+std::string get_current_dir()
+{
+	char buff[FILENAME_MAX]; //create string buffer to hold path
+	GetCurrentDir(buff, FILENAME_MAX);
+	std::string current_working_dir(buff);
+	return current_working_dir;
 }
 
 std::string getext(std::string fname)
@@ -61,7 +92,8 @@ void gethelp()
 	std::cout << "Syntax :\t";
 	SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 	std::cout<< "complirun - p \"*Directory where all the source code are stored*\"" << std::endl;
-	std::cout << "\t\tUse -o flag to store the output in a txt file [Feature Under Development]" << std::endl << std::endl;
+	std::cout << "\t\tUse -o flag followed path to a txt file to store the output in a txt file" << std::endl << std::endl;
+	std::cout << "\t\tIf you wish to run a single file use complirun - f \"*Path to the source code*\"" << std::endl << std::endl;
 	SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 	std::cout << "This Tool has been Developed by Rohan Verma and will be continued to be developed as an open source tool" << std::endl;
 	std::cout << "Developed using c++17 on Microsoft Visual Studio 2017" << std::endl;
@@ -73,7 +105,28 @@ void runJava(std::string fPath, const bool flag_outputToFile)
 {
 	if (flag_outputToFile)
 	{
-		//Code to save the output to a File
+		std::string cmd = "java \"" + fPath + "\"";
+
+		auto start = std::chrono::high_resolution_clock::now();
+		std::string lines[3];
+		lines[0]="File Name : "+getFileName(fPath);
+		lines[1]=exec(cmd);
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+		std::ostringstream out;
+		out << duration.count();
+		lines[2]="Time Taken : "+out.str()+"ms";
+		
+		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		std::cout << "Output : ";
+		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << lines[1] << std::endl;
+		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << lines[2] << std::endl << std::endl;
+		fileWriteBuffer.push_back(lines[0]);
+		fileWriteBuffer.push_back("Output : "+lines[1]);
+		fileWriteBuffer.push_back(lines[2]);
 	}
 	else
 	{
@@ -97,7 +150,28 @@ void runPy(std::string fPath, const bool flag_outputToFile)
 {
 	if (flag_outputToFile)
 	{
-		//Code to save the output to a File
+		std::string cmd = "python3 \"" + fPath + "\"";
+		std::string lines[3];
+		
+		auto start = std::chrono::high_resolution_clock::now();
+		lines[0]="File Name : " + getFileName(fPath);
+		lines[1]=exec(cmd);
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+		std::ostringstream out;
+		out << duration.count();
+		lines[2]="Time Taken : " + out.str() + "ms";
+
+		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		std::cout << "Output : ";
+		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << lines[1] << std::endl;
+		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << lines[2] << std::endl << std::endl;
+		fileWriteBuffer.push_back(lines[0]);
+		fileWriteBuffer.push_back("Output : " + lines[1]);
+		fileWriteBuffer.push_back(lines[2]);
 	}
 	else
 	{
@@ -121,7 +195,33 @@ void runCpp(std::string fPath, const bool flag_outputToFile)
 {
 	if (flag_outputToFile)
 	{
-		//Code to save the output to a File
+		std::string cmd = "c++ -o cppprog \"" + fPath + "\"";
+		std::string lines[3];
+
+		lines[0]="File Name : " + getFileName(fPath);
+		system(cmd.c_str());
+		auto start = std::chrono::high_resolution_clock::now();
+		lines[1]=exec("cppprog");
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		
+		remove("cppprog.exe");
+
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+		std::ostringstream out;
+		out << duration.count();
+		lines[2]="Time Taken : " + out.str() + "ms";
+
+		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		std::cout << "Output : ";
+		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << lines[1] << std::endl;
+		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << lines[2] << std::endl << std::endl;
+
+		fileWriteBuffer.push_back(lines[0]);
+		fileWriteBuffer.push_back("Output : " + lines[1]);
+		fileWriteBuffer.push_back(lines[2]);
 	}
 	else
 	{
@@ -160,8 +260,10 @@ int main(int argc, const char** argv)
 
 	bool flag_outputToFile = false;
 	bool flag_filePathSet = false;
+	bool flag_singleFileRun = false;
 	std::vector<std::string> filesToRun;
 	std::string path = "";
+	std::string outputFilePath = "output.txt";
 
 
 	//Retrive all the info from the Command Line
@@ -176,47 +278,104 @@ int main(int argc, const char** argv)
 		{
 			flag_filePathSet = true;
 			path = argv[++i];
+			if (path == "this")
+			{
+				path = get_current_dir();
+			}
+		}
+		if (std::string(argv[i]) == "-f" || std::string(argv[i]) == "-F")
+		{
+			flag_singleFileRun = true;
+			path = argv[++i];
 		}
 		if (std::string(argv[i]) == "-o" || std::string(argv[i]) == "-O")
 		{
 			flag_outputToFile = true;
+			outputFilePath = argv[++i]; 
+			if (outputFilePath == "this")
+			{
+				outputFilePath = get_current_dir();
+				outputFilePath += "\\output.txt";
+			}
 		}
 	}
 	//Check if path is present : if absent exit the program
-	if (flag_filePathSet==false || path=="")
+	if ((flag_filePathSet==false || path=="") && flag_singleFileRun==false)
 	{
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 		std::cout << "Error : ";
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::cout << "File Path Absent" << std::endl;
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << "use -P flag followed by the File Path of ";
+		std::cout << "To get Help type complirun help" << std::endl;
+		std::cout << "use -P flag followed by the Path of Directory containing the files" << std::endl;
+		std::cout << "Or use -F flag followed by path of specific path you want to run";
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		return 0;
 	}
-	//get all the files in the supplied directory
-	for (const auto & entry : fs::directory_iterator(path))
+
+	if (flag_filePathSet && flag_singleFileRun)
 	{
-		filesToRun.push_back(entry.path().u8string());
+		SetConsoleColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+		std::cout << "Error : ";
+		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		std::cout << "You Cannot use -f and -p at the same time" << std::endl;
+		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		return 0;
 	}
 
-	//start running all the files
-	for (std::string s : filesToRun)
+	if (flag_filePathSet)
 	{
-		std::string fileName = getFileName(s);
-		std::string fileExt = getext(s);
+		//get all the files in the supplied directory
+		for (const auto & entry : fs::directory_iterator(path))
+		{
+			filesToRun.push_back(entry.path().u8string());
+		}
+
+		//start running all the files
+		for (std::string s : filesToRun)
+		{
+			std::string fileName = getFileName(s);
+			std::string fileExt = getext(s);
+
+			SetConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+			std::cout << "Trying to Run " << fileName << std::endl;
+			SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+			if (fileExt == "java")
+				runJava(s, flag_outputToFile);
+			else if (fileExt == "py")
+				runPy(s, flag_outputToFile);
+			else if (fileExt == "cpp" || fileExt == "CPP")
+				runCpp(s, flag_outputToFile);
+			else
+				unknownFile(fileName);
+		}
+	}
+	else if (flag_singleFileRun)
+	{
+		std::string fileName = getFileName(path);
+		std::string fileExt = getext(path);
 
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::cout << "Trying to Run " << fileName << std::endl;
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		if (fileExt == "java")
-			runJava(s, flag_outputToFile);
+			runJava(path, flag_outputToFile);
 		else if (fileExt == "py")
-			runPy(s, flag_outputToFile);
+			runPy(path, flag_outputToFile);
 		else if (fileExt == "cpp" || fileExt == "CPP")
-			runCpp(s, flag_outputToFile);
+			runCpp(path, flag_outputToFile);
 		else
 			unknownFile(fileName);
+	}
+	if (flag_outputToFile)
+	{
+		std::ofstream outputFile(outputFilePath);
+		for (std::string s : fileWriteBuffer)
+		{
+			outputFile << s << std::endl;
+		}
+		outputFile.close();
 	}
 	return 0;
 }
