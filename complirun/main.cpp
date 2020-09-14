@@ -84,6 +84,18 @@ std::string getFileName(std::string fname)
 	return ext;
 }
 
+std::string readInputFile()
+{
+	std::string rt="", txt;
+	std::ifstream MyReadFile("this_is_an_inputfile.txt");
+	while (getline(MyReadFile, txt))
+	{
+		rt = rt + txt + "\n";
+	}
+	MyReadFile.close();
+	return rt;
+}
+
 void gethelp()
 {
 	SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
@@ -91,8 +103,9 @@ void gethelp()
 	SetConsoleColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 	std::cout << "Syntax :\t";
 	SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	std::cout<< "complirun - p \"*Directory where all the source code are stored*\"" << std::endl;
-	std::cout << "\t\tUse -o flag followed path to a txt file to store the output in a txt file" << std::endl << std::endl;
+	std::cout<< "complirun -p \"*Directory where all the source code are stored*\"" << std::endl;
+	std::cout << "\t\tUse -o flag followed path to a txt file to store the output in a txt file" << std::endl;
+	std::cout << "\t\tUse -i flag to provide inputs for the files to be run" << std::endl << std::endl;
 	std::cout << "\t\tIf you wish to run a single file use complirun - f \"*Path to the source code*\"" << std::endl << std::endl;
 	SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 	std::cout << "This Tool has been Developed by Rohan Verma and will be continued to be developed as an open source tool" << std::endl;
@@ -122,30 +135,45 @@ void runJava(std::string fPath, const bool flag_outputToFile, const bool flag_in
 		}
 		file.close();
 	}
+	else
+	{
+		std::ofstream file("this_is_an_inputfile.txt");
+		file << "";
+		file.close();
+	}
 	if (flag_outputToFile)
 	{
 		std::string cmd = "java \"" + fPath + "\" < this_is_an_inputfile.txt";
 
 		auto start = std::chrono::high_resolution_clock::now();
-		std::string lines[3];
+		std::string lines[4];
 		lines[0]="File Name : "+getFileName(fPath);
-		lines[1]=exec(cmd);
+		
+		if(flag_input)
+			lines[1] = "Input File Contains : \n" + readInputFile();
+		else
+			lines[1] = "Input File Contains : \nThere was No Input";
+
+		lines[2]=exec(cmd);
 
 		auto stop = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 		std::ostringstream out;
 		out << duration.count();
-		lines[2]="Time Taken : "+out.str()+"ms";
+		lines[3]="Time Taken : "+out.str()+"ms";
 		
 		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << lines[1] << std::endl;
+		std::cout << lines[2] << std::endl;
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << lines[2] << std::endl << std::endl;
+		std::cout << lines[3] << std::endl << std::endl;
 		fileWriteBuffer.push_back(lines[0]);
-		fileWriteBuffer.push_back("Output : "+lines[1]);
-		fileWriteBuffer.push_back(lines[2]);
+		fileWriteBuffer.push_back(lines[1]);
+		fileWriteBuffer.push_back("Output : "+lines[2]);
+		fileWriteBuffer.push_back(lines[3]);
+		//Adds an Empty line to provide a break line at the end of each program
+		fileWriteBuffer.push_back("");
 	}
 	else
 	{
@@ -187,30 +215,44 @@ void runPy(std::string fPath, const bool flag_outputToFile, const bool flag_inpu
 		}
 		file.close();
 	}
+	else
+	{
+		std::ofstream file("this_is_an_inputfile.txt");
+		file << "";
+		file.close();
+	}
 	if (flag_outputToFile)
 	{
 		std::string cmd = "python3 \"" + fPath + "\" < this_is_an_inputfile.txt";
-		std::string lines[3];
+		std::string lines[4];
 		
 		auto start = std::chrono::high_resolution_clock::now();
 		lines[0]="File Name : " + getFileName(fPath);
-		lines[1]=exec(cmd);
+
+		if (flag_input)
+			lines[1] = "Input File Contains : \n" + readInputFile();
+		else
+			lines[1] = "Input File Contains : \nThere was No Input";
+
+		lines[2]=exec(cmd);
 
 		auto stop = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 		std::ostringstream out;
 		out << duration.count();
-		lines[2]="Time Taken : " + out.str() + "ms";
+		lines[3]="Time Taken : " + out.str() + "ms";
 
 		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << lines[1] << std::endl;
+		std::cout << lines[2] << std::endl;
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << lines[2] << std::endl << std::endl;
+		std::cout << lines[3] << std::endl << std::endl;
 		fileWriteBuffer.push_back(lines[0]);
-		fileWriteBuffer.push_back("Output : " + lines[1]);
-		fileWriteBuffer.push_back(lines[2]);
+		fileWriteBuffer.push_back(lines[1]);
+		fileWriteBuffer.push_back("Output : " + lines[2]);
+		fileWriteBuffer.push_back(lines[3]);
+		fileWriteBuffer.push_back("");
 	}
 	else
 	{
@@ -252,15 +294,27 @@ void runCpp(std::string fPath, const bool flag_outputToFile, const bool flag_inp
 		}
 		file.close();
 	}
+	else
+	{
+		std::ofstream file("this_is_an_inputfile.txt");
+		file << "";
+		file.close();
+	}
 	if (flag_outputToFile)
 	{
 		std::string cmd = "c++ -o cppprog \"" + fPath + "\"";
-		std::string lines[3];
+		std::string lines[4];
 
 		lines[0]="File Name : " + getFileName(fPath);
-		system(cmd.c_str());
+		system(cmd.c_str()); 
+		
+		if (flag_input)
+			lines[1] = "Input File Contains : \n" + readInputFile();
+		else
+			lines[1] = "Input File Contains : \nThere was No Input";
+
 		auto start = std::chrono::high_resolution_clock::now();
-		lines[1]=exec("cppprog < this_is_an_inputfile.txt");
+		lines[2]=exec("cppprog < this_is_an_inputfile.txt");
 
 		auto stop = std::chrono::high_resolution_clock::now();
 		
@@ -269,18 +323,20 @@ void runCpp(std::string fPath, const bool flag_outputToFile, const bool flag_inp
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 		std::ostringstream out;
 		out << duration.count();
-		lines[2]="Time Taken : " + out.str() + "ms";
+		lines[3]="Time Taken : " + out.str() + "ms";
 
 		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << lines[1] << std::endl;
+		std::cout << lines[2] << std::endl;
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::cout << lines[2] << std::endl << std::endl;
+		std::cout << lines[3] << std::endl << std::endl;
 
 		fileWriteBuffer.push_back(lines[0]);
-		fileWriteBuffer.push_back("Output : " + lines[1]);
-		fileWriteBuffer.push_back(lines[2]);
+		fileWriteBuffer.push_back(lines[1]);
+		fileWriteBuffer.push_back("Output : " + lines[2]);
+		fileWriteBuffer.push_back(lines[3]);
+		fileWriteBuffer.push_back("");
 	}
 	else
 	{

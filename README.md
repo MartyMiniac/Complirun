@@ -11,6 +11,7 @@ Complirun is best suited for programs that takes no input and is being run just 
 Type `complirun help` To get Help<br>
 Use `-p` flag to add path to the directory containing all the files to be test ran<br>
 Use `-f` flag to add path to the source code<br>
-Use of `-o` flag is under development. It will be used print the output to a file<br>
+Use `-i` flag to give input for all the source code being run in the current instance<br>
+Use `-o` flag followed by a path to an existing or uncreated txt file to save the output to a file<br>
 <br>
 `Note` _You cannot use `-f` and `-p` at the Same Time_<br> 
