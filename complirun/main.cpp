@@ -6,7 +6,7 @@
 #include "stdio.h"
 #include <chrono>
 #include "fstream"
-#include "sstream";
+#include "sstream"
 
 #include "windows.h"
 
@@ -101,11 +101,30 @@ void gethelp()
 	SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 }
 
-void runJava(std::string fPath, const bool flag_outputToFile)
+void runJava(std::string fPath, const bool flag_outputToFile, const bool flag_input)
 {
+	if (flag_input)
+	{
+		std::cout << "Enter the inputs for the file" << std::endl << "The program will keep on accepting inputs till it Encounters a line without any text" << std::endl;
+		std::vector<std::string> fileinputlines;
+		std::ofstream file("this_is_an_inputfile.txt");
+		std::string inpt = "";
+		do
+		{
+			getline(std::cin, inpt);
+			fileinputlines.push_back(inpt);
+		} while (inpt != "");
+		for (int i = 0; i < fileinputlines.size() - 1; i++)
+		{
+			file << fileinputlines[i];
+			if (i < fileinputlines.size() - 2)
+				file << std::endl;
+		}
+		file.close();
+	}
 	if (flag_outputToFile)
 	{
-		std::string cmd = "java \"" + fPath + "\"";
+		std::string cmd = "java \"" + fPath + "\" < this_is_an_inputfile.txt";
 
 		auto start = std::chrono::high_resolution_clock::now();
 		std::string lines[3];
@@ -133,7 +152,7 @@ void runJava(std::string fPath, const bool flag_outputToFile)
 		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::string cmd = "java \"" + fPath + "\"";
+		std::string cmd = "java \"" + fPath + "\" < this_is_an_inputfile.txt";
 
 		auto start = std::chrono::high_resolution_clock::now();
 
@@ -144,13 +163,33 @@ void runJava(std::string fPath, const bool flag_outputToFile)
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::cout << "Time Taken : " << duration.count() << "ms" << std::endl << std::endl;
 	}
+	remove("this_is_an_inputfile.txt");
 }
 
-void runPy(std::string fPath, const bool flag_outputToFile)
+void runPy(std::string fPath, const bool flag_outputToFile, const bool flag_input)
 {
+	if (flag_input)
+	{
+		std::cout << "Enter the inputs for the file" << std::endl << "The program will keep on accepting inputs till it Encounters a line without any text" << std::endl;
+		std::vector<std::string> fileinputlines;
+		std::ofstream file("this_is_an_inputfile.txt");
+		std::string inpt = "";
+		do
+		{
+			getline(std::cin, inpt);
+			fileinputlines.push_back(inpt);
+		} while (inpt != "");
+		for (int i = 0; i < fileinputlines.size() - 1; i++)
+		{
+			file << fileinputlines[i];
+			if (i < fileinputlines.size() - 2)
+				file << std::endl;
+		}
+		file.close();
+	}
 	if (flag_outputToFile)
 	{
-		std::string cmd = "python3 \"" + fPath + "\"";
+		std::string cmd = "python3 \"" + fPath + "\" < this_is_an_inputfile.txt";
 		std::string lines[3];
 		
 		auto start = std::chrono::high_resolution_clock::now();
@@ -178,7 +217,7 @@ void runPy(std::string fPath, const bool flag_outputToFile)
 		SetConsoleColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		std::cout << "Output : ";
 		SetConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		std::string cmd = "python3 \"" + fPath + "\"";
+		std::string cmd = "python3 \"" + fPath + "\" < this_is_an_inputfile.txt";
 
 		auto start = std::chrono::high_resolution_clock::now();
 
@@ -189,10 +228,30 @@ void runPy(std::string fPath, const bool flag_outputToFile)
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::cout << "Time Taken : " << duration.count() << "ms" << std::endl << std::endl;
 	}
+	remove("this_is_an_inputfile.txt");
 }
 
-void runCpp(std::string fPath, const bool flag_outputToFile)
+void runCpp(std::string fPath, const bool flag_outputToFile, const bool flag_input)
 {
+	if (flag_input)
+	{
+		std::cout << "Enter the inputs for the file" << std::endl << "The program will keep on accepting inputs till it Encounters a line without any text" << std::endl;
+		std::vector<std::string> fileinputlines;
+		std::ofstream file("this_is_an_inputfile.txt");
+		std::string inpt = "";
+		do
+		{
+			getline(std::cin, inpt);
+			fileinputlines.push_back(inpt);
+		} while (inpt != "");
+		for (int i = 0; i < fileinputlines.size() - 1; i++)
+		{
+			file << fileinputlines[i];
+			if (i < fileinputlines.size() - 2)
+				file << std::endl;
+		}
+		file.close();
+	}
 	if (flag_outputToFile)
 	{
 		std::string cmd = "c++ -o cppprog \"" + fPath + "\"";
@@ -201,7 +260,7 @@ void runCpp(std::string fPath, const bool flag_outputToFile)
 		lines[0]="File Name : " + getFileName(fPath);
 		system(cmd.c_str());
 		auto start = std::chrono::high_resolution_clock::now();
-		lines[1]=exec("cppprog");
+		lines[1]=exec("cppprog < this_is_an_inputfile.txt");
 
 		auto stop = std::chrono::high_resolution_clock::now();
 		
@@ -233,7 +292,7 @@ void runCpp(std::string fPath, const bool flag_outputToFile)
 
 		auto start = std::chrono::high_resolution_clock::now();
 
-		system("cppprog.exe");
+		system("cppprog.exe < this_is_an_inputfile.txt");
 
 		auto stop = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -243,6 +302,7 @@ void runCpp(std::string fPath, const bool flag_outputToFile)
 		remove("cppprog.exe");
 		std::cout << std::endl;
 	}
+	remove("this_is_an_inputfile.txt");
 }
 
 void unknownFile(std::string fname)
@@ -261,6 +321,7 @@ int main(int argc, const char** argv)
 	bool flag_outputToFile = false;
 	bool flag_filePathSet = false;
 	bool flag_singleFileRun = false;
+	bool flag_input = false;
 	std::vector<std::string> filesToRun;
 	std::string path = "";
 	std::string outputFilePath = "output.txt";
@@ -297,6 +358,10 @@ int main(int argc, const char** argv)
 				outputFilePath = get_current_dir();
 				outputFilePath += "\\output.txt";
 			}
+		}
+		if (std::string(argv[i]) == "-i" || std::string(argv[i]) == "-I")
+		{
+			flag_input = true;
 		}
 	}
 	//Check if path is present : if absent exit the program
@@ -342,11 +407,11 @@ int main(int argc, const char** argv)
 			std::cout << "Trying to Run " << fileName << std::endl;
 			SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 			if (fileExt == "java")
-				runJava(s, flag_outputToFile);
+				runJava(s, flag_outputToFile, flag_input);
 			else if (fileExt == "py")
-				runPy(s, flag_outputToFile);
+				runPy(s, flag_outputToFile, flag_input);
 			else if (fileExt == "cpp" || fileExt == "CPP")
-				runCpp(s, flag_outputToFile);
+				runCpp(s, flag_outputToFile, flag_input);
 			else
 				unknownFile(fileName);
 		}
@@ -360,11 +425,11 @@ int main(int argc, const char** argv)
 		std::cout << "Trying to Run " << fileName << std::endl;
 		SetConsoleColor(FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		if (fileExt == "java")
-			runJava(path, flag_outputToFile);
+			runJava(path, flag_outputToFile, flag_input);
 		else if (fileExt == "py")
-			runPy(path, flag_outputToFile);
+			runPy(path, flag_outputToFile, flag_input);
 		else if (fileExt == "cpp" || fileExt == "CPP")
-			runCpp(path, flag_outputToFile);
+			runCpp(path, flag_outputToFile, flag_input);
 		else
 			unknownFile(fileName);
 	}
